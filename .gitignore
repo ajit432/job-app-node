@@ -1,0 +1,13 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# Ignore database connection file
+src/config/db.js

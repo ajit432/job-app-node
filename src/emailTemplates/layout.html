@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{subject}}</title>
+</head>
+<body style="background-color: #f7f7f7; font-family: Arial, sans-serif; padding: 20px;">
+
+   
+  {{#showContainer}}
+  <!-- If showContainer is true, render the fancy boxed layout -->
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td align="center">
+        <!-- Main content container table -->
+        <table width="800" border="0" cellspacing="0" cellpadding="0" style="max-width: 800px; background-color: white; border: 1px solid #d1d1d1; border-radius: 8px;">
+          
+          {{#isShowHeader}}
+          <tr>
+            <td>
+              <div style="background-color: #004d99; color: white; padding: 10px; text-align: center; border-radius: 8px 8px 0 0;">
+                <h1>{{companyName}}</h1>
+              </div>
+            </td>
+          </tr>
+          {{/isShowHeader}}
+          
+          <tr>
+            <td>{{{body}}}</td>
+          </tr>
+
+          {{#isShowFooter}}
+          <tr>
+            <td>
+              <div style="padding: 20px; font-size: 12px; text-align: center; color: #777; border-top: 1px solid #eee;">
+                <p>If you did not request this email, please ignore it.</p>
+                <p>© {{currentYear}} {{companyName}}. All rights reserved.</p>
+              </div>
+            </td>
+          </tr>
+          {{/isShowFooter}}
+
+        </table>
+      </td>
+    </tr>
+  </table>
+  {{/showContainer}}
+
+  {{^showContainer}}
+    <!-- If showContainer is false (or not present), just render the body directly -->
+    {{{body}}}
+  {{/showContainer}} 
+
+</body>
+</html>
