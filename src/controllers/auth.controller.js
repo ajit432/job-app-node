@@ -1,16 +1,20 @@
 const bcrypt = require('bcryptjs');
+const { OAuth2Client } = require('google-auth-library');
 const logger = require('../utils/logger');
 const jwt = require('../utils/jwt');
 const mailer = require('../utils/mailer');
 const sqlService = require('../services/sql.service');
 const templateService = require('../utils/template.service');
 const emailManifest = require('../emailTemplates');
-const { OTP_EXPIRY_MS, OTP_VALIDITY_MINUTES, SUPPORT_EMAIL } = require('../config/appConfig');
+const { OTP_EXPIRY_MS, OTP_VALIDITY_MINUTES, SUPPORT_EMAIL, GOOGLE_CLIENT_ID } = require('../config/appConfig');
 const { sanitizeValue } = require('../utils/formatter');
+const dateHandler = require('../utils/dateHandler');
+
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 // POST /api/v1/auth/register
 exports.register = async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, profileType} = req.body;
     
     if (!email) {
         return res.status(400).json({
@@ -44,8 +48,8 @@ exports.register = async (req, res, next) => {
 
         // Create new user
         const userData = {
-            columns: ['email', 'password', 'is_active'],
-            values: [email, hashedPassword, true]
+            columns: ['email', 'password', 'is_active', 'profile_type'],
+            values: [email, hashedPassword, true, profileType]
         };
 
         const userResult = await sqlService.executeQuery('INSERT', 'users', userData, 
@@ -103,14 +107,13 @@ exports.register = async (req, res, next) => {
             success: true,
             message: 'User registered successfully',
             data: {
-                accessToken: token,
                 user: {
                     id: newUser.id,
                     email: newUser.email,
                     isActive: newUser.is_active,
                     profileType: newUser.profile_type,
-                    createdAt: newUser.created_at,
-                    updatedAt: newUser.updated_at
+                    createdAt: dateHandler.dbTimestampToISTDisplay(newUser.created_at),
+                    updatedAt: dateHandler.dbTimestampToISTDisplay(newUser.updated_at)
                 }
             }
         });
@@ -230,8 +233,8 @@ exports.login = async (req, res, next) => {
                     email: user.email,
                     isActive: user.is_active,
                     profileType: user.profile_type,
-                    createdAt: user.created_at,
-                    updatedAt: user.updated_at
+                    createdAt: dateHandler.dbTimestampToISTDisplay(user.created_at),
+                    updatedAt: dateHandler.dbTimestampToISTDisplay(user.updated_at)
                 }
             }
         });

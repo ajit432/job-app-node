@@ -9,10 +9,10 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     is_active BOOLEAN DEFAULT true,
-    profile_type ENUM('job_seeker', 'recruiter') DEFAULT NULL, -- Set only once
+    profile_type ENUM('job_seeker', 'recruiter','companies') DEFAULT NULL, -- Set only once
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 2. OTP Verification Table
@@ -24,7 +24,7 @@ CREATE TABLE otp_verifications (
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_email_expires (email, expires_at)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 3. User Profiles Table
@@ -43,7 +43,7 @@ CREATE TABLE user_profiles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 4. Job Seeker Profiles Table
@@ -59,7 +59,7 @@ CREATE TABLE job_seeker_profiles (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 5. Skills Table
@@ -69,7 +69,7 @@ CREATE TABLE skills (
     name VARCHAR(100) UNIQUE NOT NULL,
     category VARCHAR(100), -- e.g., 'programming', 'design', 'management'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 6. User Skills Table
@@ -84,7 +84,7 @@ CREATE TABLE user_skills (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (skill_id) REFERENCES skills(id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_skill (user_id, skill_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 7. Education Table
@@ -103,7 +103,7 @@ CREATE TABLE education (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 8. Experience Table
@@ -122,7 +122,7 @@ CREATE TABLE experience (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 9. Companies Table
@@ -141,7 +141,7 @@ CREATE TABLE companies (
     is_verified BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 10. Recruiter Profiles Table
@@ -158,7 +158,7 @@ CREATE TABLE recruiter_profiles (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ## Social Features Tables
@@ -178,7 +178,7 @@ CREATE TABLE posts (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_created (user_id, created_at),
     INDEX idx_type_created (post_type, created_at)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 12. Job Posts Table
@@ -205,7 +205,7 @@ CREATE TABLE job_posts (
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE SET NULL,
     INDEX idx_active_created (is_active, created_at),
     INDEX idx_location_type (location, job_type)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 13. Job Skills Required Table
@@ -220,7 +220,7 @@ CREATE TABLE job_skills_required (
     FOREIGN KEY (job_post_id) REFERENCES job_posts(id) ON DELETE CASCADE,
     FOREIGN KEY (skill_id) REFERENCES skills(id) ON DELETE CASCADE,
     UNIQUE KEY unique_job_skill (job_post_id, skill_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 14. Follows Table
@@ -235,7 +235,7 @@ CREATE TABLE follows (
     UNIQUE KEY unique_follow (follower_id, following_id, following_type),
     INDEX idx_follower (follower_id),
     INDEX idx_following (following_id, following_type)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 15. Post Interactions Table
@@ -250,7 +250,7 @@ CREATE TABLE post_interactions (
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_post_interaction (user_id, post_id, interaction_type),
     INDEX idx_post_type (post_id, interaction_type)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 16. Comments Table
@@ -267,7 +267,7 @@ CREATE TABLE comments (
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (parent_comment_id) REFERENCES comments(id) ON DELETE CASCADE,
     INDEX idx_post_created (post_id, created_at)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ## Job Application System
@@ -288,7 +288,7 @@ CREATE TABLE job_applications (
     UNIQUE KEY unique_application (job_post_id, applicant_id),
     INDEX idx_applicant_status (applicant_id, status),
     INDEX idx_job_status (job_post_id, status)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 18. Interview Schedules Table
@@ -308,7 +308,7 @@ CREATE TABLE interview_schedules (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (application_id) REFERENCES job_applications(id) ON DELETE CASCADE,
     FOREIGN KEY (interviewer_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ## Chat System
@@ -325,7 +325,7 @@ CREATE TABLE chat_conversations (
     FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE KEY unique_conversation (LEAST(user1_id, user2_id), GREATEST(user1_id, user2_id)),
     INDEX idx_users (user1_id, user2_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### 20. Chat Messages Table
@@ -342,7 +342,7 @@ CREATE TABLE chat_messages (
     FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_conversation_created (conversation_id, created_at)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ## Notification System
@@ -360,7 +360,26 @@ CREATE TABLE notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_read_created (user_id, is_read, created_at)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### 22. Notification Settings Table
+```sql
+CREATE TABLE notification_settings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT UNIQUE NOT NULL,
+    email_notifications BOOLEAN DEFAULT true,
+    push_notifications BOOLEAN DEFAULT true,
+    job_alerts BOOLEAN DEFAULT true,
+    application_updates BOOLEAN DEFAULT true,
+    new_followers BOOLEAN DEFAULT true,
+    post_interactions BOOLEAN DEFAULT true,
+    messages BOOLEAN DEFAULT true,
+    system_notifications BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ## Additional Indexes for Performance
@@ -373,6 +392,17 @@ CREATE INDEX idx_applications_status_date ON job_applications(status, applied_at
 CREATE INDEX idx_follows_follower_type ON follows(follower_id, following_type);
 CREATE INDEX idx_user_skills_user ON user_skills(user_id);
 CREATE INDEX idx_notifications_user_unread ON notifications(user_id, is_read, created_at);
+CREATE INDEX idx_notification_settings_user ON notification_settings(user_id);
+```
+
+## Timezone Configuration
+
+```sql
+-- Set MySQL timezone to IST (Asia/Kolkata)
+SET time_zone = '+05:30';
+
+-- Or set it globally for the session
+SET GLOBAL time_zone = '+05:30';
 ```
 
 ## Key Features Supported:
