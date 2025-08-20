@@ -356,6 +356,19 @@ exports.verifyOtp = async (req, res, next) => {
             });
         }
 
+        // Get user data
+        const [user] = await sqlService.executeQuery('SELECT', 'users', {
+            columns: ['id', 'email', 'is_active', 'profile_type', 'created_at', 'updated_at'],
+            where: { email, is_active: true }
+        }, { controller: 'auth.controller', function: 'verifyOtp' });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
         // Delete used OTP
         await sqlService.executeQuery('DELETE', 'otp_verifications', {
             where: { id: validOtp.id }
@@ -365,7 +378,15 @@ exports.verifyOtp = async (req, res, next) => {
             success: true,
             message: 'OTP verified successfully',
             data: {
-                token: jwt.generateToken({ email, verified: true }, '15m') // Short-lived token for password reset
+                token: jwt.generateToken({ email, verified: true }, '15m'), // Short-lived token for password reset
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    isActive: user.is_active,
+                    profileType: user.profile_type,
+                    createdAt: dateHandler.dbTimestampToISTDisplay(user.created_at),
+                    updatedAt: dateHandler.dbTimestampToISTDisplay(user.updated_at)
+                }
             }
         });
 

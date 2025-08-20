@@ -5,7 +5,7 @@ const auth = require('../../middleware/auth');
 
 // Profile routes
 router.get('/profile', auth.authMiddleware, userController.getUserProfile);
-router.put('/profile', auth.authMiddleware, userController.updateUserProfile);
+router.post('/profile', auth.authMiddleware, userController.updateUserProfile);
 router.post('/set-profile-type', auth.authMiddleware, userController.setProfileType);
 
 // File upload routes
